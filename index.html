@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      Interactive Report: Automated Tollbooth System for Amrahia-Accra
+    </title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Visualization & Content Choices: 
+        - Report Info: Manual vs. Automated Tolls (Table 1) -> Goal: Compare -> Viz: Bar Chart -> Interaction: Hover tooltips -> Justification: More visually impactful than a table for comparing performance metrics. -> Library: Chart.js.
+        - Report Info: System Components & Architecture (Sec 3) -> Goal: Organize/Inform -> Viz: Interactive Diagram (HTML/CSS) -> Interaction: Click on component to see details -> Justification: Makes dense technical data explorable and less intimidating. -> Library: Vanilla JS.
+        - Report Info: System Challenges (Table 3) -> Goal: Organize -> Viz: Accordion Component -> Interaction: Click to expand/collapse -> Justification: Manages a large volume of text cleanly, allowing users to focus on specific areas of concern. -> Library: Vanilla JS.
+        - Report Info: Key Stats (Revenue, etc.) -> Goal: Inform -> Viz: Stat Cards -> Interaction: None -> Justification: Highlights critical numbers for immediate impact. -> Library: HTML/Tailwind.
+    -->
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+      .chart-container {
+        position: relative;
+        width: 100%;
+        max-width: 800px;
+        margin-left: auto;
+        margin-right: auto;
+        height: 300px;
+        max-height: 40vh;
+      }
+      @media (min-width: 768px) {
+        .chart-container {
+          height: 400px;
+        }
+      }
+      .component-card.active {
+        box-shadow: 0 0 0 3px #38bdf8; /* sky-400 */
+        transform: scale(1.03);
+      }
+      .accordion-content {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.5s cubic-bezier(0, 1, 0, 1);
+      }
+      .accordion-content.show {
+        max-height: 1000px; /* Large enough for content */
+        transition: max-height 1s ease-in-out;
+      }
+      .arrow {
+        position: absolute;
+        background-color: #64748b; /* slate-500 */
+        z-index: 0;
+      }
+      .arrow.h {
+        height: 2px;
+      }
+      .arrow.v {
+        width: 2px;
+      }
+    </style>
+  </head>
+  <body class="bg-slate-50 text-slate-800">
+    <header
+      class="bg-white/80 backdrop-blur-lg sticky top-0 z-40 border-b border-slate-200"
+    >
+      <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+          <div class="flex items-center">
+            <span class="text-xl font-bold text-sky-600">Toll Flow </span>
+          </div>
+          <div class="hidden md:block">
+            <div class="ml-10 flex items-baseline space-x-4">
+              <a
+                href="#overview"
+                class="text-slate-600 hover:bg-slate-100 hover:text-slate-900 px-3 py-2 rounded-md text-sm font-medium"
+                >Overview</a
+              >
+              <a
+                href="#how-it-works"
+                class="text-slate-600 hover:bg-slate-100 hover:text-slate-900 px-3 py-2 rounded-md text-sm font-medium"
+                >How It Works</a
+              >
+              <a
+                href="#benefits"
+                class="text-slate-600 hover:bg-slate-100 hover:text-slate-900 px-3 py-2 rounded-md text-sm font-medium"
+                >Benefits</a
+              >
+              <a
+                href="#challenges"
+                class="text-slate-600 hover:bg-slate-100 hover:text-slate-900 px-3 py-2 rounded-md text-sm font-medium"
+                >Challenges</a
+              >
+              <a
+                href="#future"
+                class="text-slate-600 hover:bg-slate-100 hover:text-slate-900 px-3 py-2 rounded-md text-sm font-medium"
+                >The Future</a
+              >
+            </div>
+          </div>
+          <div class="md:hidden">
+            <button
+              id="mobile-menu-button"
+              class="inline-flex items-center justify-center p-2 rounded-md text-slate-400 hover:text-white hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-800 focus:ring-white"
+            >
+              <span class="sr-only">Open main menu</span>
+              <svg
+                class="h-6 w-6"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </nav>
+      <div id="mobile-menu" class="md:hidden hidden">
+        <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+          <a
+            href="#overview"
+            class="text-slate-600 hover:bg-slate-100 block px-3 py-2 rounded-md text-base font-medium"
+            >Overview</a
+          >
+          <a
+            href="#how-it-works"
+            class="text-slate-600 hover:bg-slate-100 block px-3 py-2 rounded-md text-base font-medium"
+            >How It Works</a
+          >
+          <a
+            href="#benefits"
+            class="text-slate-600 hover:bg-slate-100 block px-3 py-2 rounded-md text-base font-medium"
+            >Benefits</a
+          >
+          <a
+            href="#challenges"
+            class="text-slate-600 hover:bg-slate-100 block px-3 py-2 rounded-md text-base font-medium"
+            >Challenges</a
+          >
+          <a
+            href="#future"
+            class="text-slate-600 hover:bg-slate-100 block px-3 py-2 rounded-md text-base font-medium"
+            >The Future</a
+          >
+        </div>
+      </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+      <section class="text-center py-16 md:py-24">
+        <h1
+          class="text-4xl md:text-6xl font-extrabold tracking-tight text-slate-900"
+        >
+          Modernizing Ghana's Tollbooths
+        </h1>
+        <p class="mt-4 max-w-2xl mx-auto text-lg md:text-xl text-slate-600">
+          An interactive exploration of the design and implementation of an
+          automated toll system for the Amrahia-Accra corridor.
+        </p>
+      </section>
+
+      <section id="overview" class="py-16 md:py-24 border-t border-slate-200">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl md:text-4xl font-bold tracking-tight">
+            The Problem & The Promise
+          </h2>
+          <p class="mt-4 max-w-3xl mx-auto text-lg text-slate-600">
+            Ghana's manual tolling system was plagued by inefficiency, revenue
+            loss, and traffic congestion. The proposed automated system offers a
+            transformative solution. This section provides an overview of the
+            challenges with the old system and the significant improvements
+            offered by automation, setting the stage for the technical
+            deep-dive.
+          </p>
+        </div>
+        <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-lg">
+          <div class="chart-container">
+            <canvas id="comparisonChart"></canvas>
+          </div>
+        </div>
+        <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+          <div class="bg-white p-6 rounded-xl shadow">
+            <p class="text-3xl font-bold text-sky-600">GH¢1B</p>
+            <p class="text-slate-500 mt-1">Estimated Annual Revenue Lost</p>
+          </div>
+          <div class="bg-white p-6 rounded-xl shadow">
+            <p class="text-3xl font-bold text-sky-600">>1 Minute</p>
+            <p class="text-slate-500 mt-1">Typical Manual Wait Time</p>
+          </div>
+          <div class="bg-white p-6 rounded-xl shadow">
+            <p class="text-3xl font-bold text-sky-600">~5 Seconds</p>
+            <p class="text-slate-500 mt-1">
+              Potential Automated Transaction Time
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section
+        id="how-it-works"
+        class="py-16 md:py-24 border-t border-slate-200"
+      >
+        <div class="text-center mb-12">
+          <h2 class="text-3xl md:text-4xl font-bold tracking-tight">
+            How It Works: An Interactive Journey
+          </h2>
+          <p class="mt-4 max-w-3xl mx-auto text-lg text-slate-600">
+            This section breaks down the core technology of the automated
+            tollbooth. The system is an orchestra of sensors, processors, and
+            actuators working in harmony. Click on each component in the diagram
+            below to understand its specific role in creating a seamless and
+            efficient tolling experience from vehicle approach to exit.
+          </p>
+        </div>
+        <div class="lg:grid lg:grid-cols-3 lg:gap-8 items-start">
+          <div class="lg:col-span-2 relative">
+            <div
+              class="relative grid grid-cols-1 md:grid-cols-3 gap-y-12 md:gap-x-8 md:gap-y-16 items-center p-4"
+            >
+              <div
+                id="comp-ir1"
+                class="component-card cursor-pointer p-4 bg-white rounded-lg shadow-md hover:shadow-xl transition-all text-center"
+                data-target="info-ir1"
+              >
+                <h3 class="font-semibold">1. Vehicle Detection</h3>
+                <p class="text-sm text-slate-500">IR/Ultrasonic Sensor</p>
+              </div>
+              <div
+                id="comp-rfid"
+                class="component-card cursor-pointer p-4 bg-white rounded-lg shadow-md hover:shadow-xl transition-all text-center"
+                data-target="info-rfid"
+              >
+                <h3 class="font-semibold">2. Identification</h3>
+                <p class="text-sm text-slate-500">RFID Reader</p>
+              </div>
+              <div
+                id="comp-load"
+                class="component-card cursor-pointer p-4 bg-white rounded-lg shadow-md hover:shadow-xl transition-all text-center"
+                data-target="info-load"
+              >
+                <h3 class="font-semibold">3. Weighing</h3>
+                <p class="text-sm text-slate-500">Load Cell Sensor</p>
+              </div>
+              <div
+                id="comp-arduino"
+                class="component-card cursor-pointer p-4 bg-sky-100 border-2 border-sky-400 rounded-lg shadow-md hover:shadow-xl transition-all text-center md:col-span-3"
+                data-target="info-arduino"
+              >
+                <h3 class="font-semibold">4. Central Processing</h3>
+                <p class="text-sm text-slate-500">Arduino Microcontroller</p>
+              </div>
+              <div
+                id="comp-gsm"
+                class="component-card cursor-pointer p-4 bg-white rounded-lg shadow-md hover:shadow-xl transition-all text-center"
+                data-target="info-gsm"
+              >
+                <h3 class="font-semibold">5a. Communication</h3>
+                <p class="text-sm text-slate-500">GSM/Wi-Fi Module</p>
+              </div>
+              <div
+                id="comp-lcd"
+                class="component-card cursor-pointer p-4 bg-white rounded-lg shadow-md hover:shadow-xl transition-all text-center"
+                data-target="info-lcd"
+              >
+                <h3 class="font-semibold">5b. User Feedback</h3>
+                <p class="text-sm text-slate-500">LCD/OLED Display</p>
+              </div>
+              <div
+                id="comp-servo"
+                class="component-card cursor-pointer p-4 bg-white rounded-lg shadow-md hover:shadow-xl transition-all text-center"
+                data-target="info-servo"
+              >
+                <h3 class="font-semibold">5c. Action</h3>
+                <p class="text-sm text-slate-500">Servo Motor (Barrier)</p>
+              </div>
+            </div>
+          </div>
+          <div
+            id="component-info-panel"
+            class="mt-8 lg:mt-0 p-6 bg-white rounded-2xl shadow-lg min-h-[300px] flex flex-col justify-center"
+          >
+            <div id="info-initial" class="text-slate-500 text-center">
+              <p class="text-lg font-medium">
+                Click a component to see details
+              </p>
+              <p class="mt-2">
+                Explore the technology that powers the automated toll system.
+              </p>
+            </div>
+            <div id="info-ir1" class="hidden component-info">
+              <h4 class="font-bold text-lg text-sky-700">
+                Vehicle Detection Sensors
+              </h4>
+              <p class="mt-2 text-slate-600">
+                Infrared (IR) or Ultrasonic sensors are placed at the entry to
+                detect an approaching vehicle. They are the system's first
+                trigger, signaling the start of the tolling process. They also
+                ensure the vehicle is correctly positioned on the weighing
+                platform for an accurate reading.
+              </p>
+            </div>
+            <div id="info-rfid" class="hidden component-info">
+              <h4 class="font-bold text-lg text-sky-700">RFID Reader</h4>
+              <p class="mt-2 text-slate-600">
+                The RFID reader emits radio waves to scan a tag on the vehicle's
+                windshield. It retrieves a Unique ID (UID) linked to the
+                vehicle's account, balance, and class. This allows for fast,
+                contactless identification without driver intervention.
+              </p>
+            </div>
+            <div id="info-load" class="hidden component-info">
+              <h4 class="font-bold text-lg text-sky-700">Load Cell</h4>
+              <p class="mt-2 text-slate-600">
+                This sensor precisely measures the vehicle's weight. The data is
+                crucial for classifying the vehicle (e.g., light vs. heavy
+                goods) to apply the correct toll rate and to detect illegally
+                overloaded trucks, helping to preserve road infrastructure.
+              </p>
+            </div>
+            <div id="info-arduino" class="hidden component-info">
+              <h4 class="font-bold text-lg text-sky-700">
+                Arduino Microcontroller
+              </h4>
+              <p class="mt-2 text-slate-600">
+                The "brain" of the system. This open-source microcontroller
+                processes all incoming data from the sensors, performs
+                calculations, checks the vehicle's account balance, and sends
+                commands to the barrier, display, and communication modules. It
+                makes the real-time decisions that automate the entire process.
+              </p>
+            </div>
+            <div id="info-gsm" class="hidden component-info">
+              <h4 class="font-bold text-lg text-sky-700">
+                Communication Module (GSM/Wi-Fi)
+              </h4>
+              <p class="mt-2 text-slate-600">
+                This module connects the local tollbooth to a central database.
+                It's used to send transaction details, log data for analysis,
+                send SMS alerts to drivers about payments or overload status,
+                and check for information like stolen vehicles in real-time.
+              </p>
+            </div>
+            <div id="info-lcd" class="hidden component-info">
+              <h4 class="font-bold text-lg text-sky-700">
+                User Feedback Display (LCD/OLED)
+              </h4>
+              <p class="mt-2 text-slate-600">
+                A small screen provides instant feedback to the driver,
+                displaying information like the toll amount, transaction status
+                (e.g., "Access Granted", "Insufficient Balance"), and the
+                remaining account balance, ensuring transparency.
+              </p>
+            </div>
+            <div id="info-servo" class="hidden component-info">
+              <h4 class="font-bold text-lg text-sky-700">Servo Motor</h4>
+              <p class="mt-2 text-slate-600">
+                This is the actuator that controls the physical barrier. Upon
+                successful payment verification from the Arduino, the servo
+                motor receives a signal to lift the gate, allowing the vehicle
+                to pass. It closes automatically after the vehicle has cleared
+                the area.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="benefits" class="py-16 md:py-24 border-t border-slate-200">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl md:text-4xl font-bold tracking-tight">
+            Benefits for Amrahia-Accra & Ghana
+          </h2>
+          <p class="mt-4 max-w-3xl mx-auto text-lg text-slate-600">
+            The implementation of an automated toll system brings a multitude of
+            advantages that directly address local and national challenges. This
+            section highlights the key positive impacts, from smoother commutes
+            for drivers to better financial outcomes for the nation.
+          </p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div
+            class="bg-white p-6 rounded-2xl shadow-lg transform hover:scale-105 transition-transform duration-300"
+          >
+            <div
+              class="flex items-center justify-center h-12 w-12 rounded-full bg-sky-100 text-sky-600 text-2xl mb-4"
+            >
+              🚗
+            </div>
+            <h3 class="text-xl font-semibold">Reduced Traffic Congestion</h3>
+            <p class="mt-2 text-slate-600">
+              By automating payments and eliminating stops, the system
+              drastically cuts down queues and vehicle wait times, leading to
+              smoother traffic flow.
+            </p>
+          </div>
+          <div
+            class="bg-white p-6 rounded-2xl shadow-lg transform hover:scale-105 transition-transform duration-300"
+          >
+            <div
+              class="flex items-center justify-center h-12 w-12 rounded-full bg-sky-100 text-sky-600 text-2xl mb-4"
+            >
+              💰
+            </div>
+            <h3 class="text-xl font-semibold">Improved Revenue Collection</h3>
+            <p class="mt-2 text-slate-600">
+              Automation minimizes human error and potential revenue leakages,
+              ensuring transparent and accurate fund collection for
+              infrastructure development.
+            </p>
+          </div>
+          <div
+            class="bg-white p-6 rounded-2xl shadow-lg transform hover:scale-105 transition-transform duration-300"
+          >
+            <div
+              class="flex items-center justify-center h-12 w-12 rounded-full bg-sky-100 text-sky-600 text-2xl mb-4"
+            >
+              🌿
+            </div>
+            <h3 class="text-xl font-semibold">Environmental Improvements</h3>
+            <p class="mt-2 text-slate-600">
+              Less idling time at tollbooths means lower fuel consumption and a
+              significant reduction in harmful vehicle emissions.
+            </p>
+          </div>
+          <div
+            class="bg-white p-6 rounded-2xl shadow-lg transform hover:scale-105 transition-transform duration-300"
+          >
+            <div
+              class="flex items-center justify-center h-12 w-12 rounded-full bg-sky-100 text-sky-600 text-2xl mb-4"
+            >
+              👍
+            </div>
+            <h3 class="text-xl font-semibold">Enhanced User Experience</h3>
+            <p class="mt-2 text-slate-600">
+              Drivers enjoy a seamless, hassle-free payment process, leading to
+              faster, more predictable, and less stressful travel times.
+            </p>
+          </div>
+          <div
+            class="bg-white p-6 rounded-2xl shadow-lg transform hover:scale-105 transition-transform duration-300"
+          >
+            <div
+              class="flex items-center justify-center h-12 w-12 rounded-full bg-sky-100 text-sky-600 text-2xl mb-4"
+            >
+              🌉
+            </div>
+            <h3 class="text-xl font-semibold">Infrastructure Preservation</h3>
+            <p class="mt-2 text-slate-600">
+              Integrated load sensors detect overloaded vehicles, helping to
+              prevent road damage and reduce long-term maintenance costs.
+            </p>
+          </div>
+          <div
+            class="bg-white p-6 rounded-2xl shadow-lg transform hover:scale-105 transition-transform duration-300"
+          >
+            <div
+              class="flex items-center justify-center h-12 w-12 rounded-full bg-sky-100 text-sky-600 text-2xl mb-4"
+            >
+              🛡️
+            </div>
+            <h3 class="text-xl font-semibold">Increased Safety & Security</h3>
+            <p class="mt-2 text-slate-600">
+              The system can be linked to databases to flag stolen vehicles, and
+              smoother traffic flow contributes to fewer accidents on toll
+              routes.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="challenges" class="py-16 md:py-24 border-t border-slate-200">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl md:text-4xl font-bold tracking-tight">
+            Challenges & Solutions
+          </h2>
+          <p class="mt-4 max-w-3xl mx-auto text-lg text-slate-600">
+            Implementing any large-scale technological project comes with
+            hurdles. A successful deployment requires anticipating these issues
+            and planning effective mitigation strategies. This section provides
+            a transparent look at the potential challenges from technical
+            reliability to public adoption and the solutions proposed to
+            overcome them.
+          </p>
+        </div>
+        <div class="max-w-4xl mx-auto space-y-4">
+          <div class="bg-white rounded-lg shadow-md">
+            <button
+              class="accordion-header w-full flex justify-between items-center text-left p-5 font-semibold text-lg"
+            >
+              <span>Technical Reliability</span>
+              <span class="transform transition-transform duration-300">▼</span>
+            </button>
+            <div class="accordion-content">
+              <div
+                class="p-5 border-t border-slate-200 text-slate-600 space-y-4"
+              >
+                <div>
+                  <strong class="text-slate-800">Challenge:</strong> RFID
+                  systems can suffer from signal interference (crosstalk),
+                  physical obstructions (metal), and environmental factors
+                  (humidity, dust).
+                </div>
+                <div>
+                  <strong class="text-slate-800">Solution:</strong> Strategic
+                  reader placement, using specialized tags for different
+                  environments, employing advanced communication protocols (like
+                  TDMA), and regular hardware maintenance.
+                </div>
+                <hr />
+                <div>
+                  <strong class="text-slate-800">Challenge:</strong> Load cells
+                  can be damaged by shock overload or side loading, and their
+                  accuracy can be affected by temperature changes.
+                </div>
+                <div>
+                  <strong class="text-slate-800">Solution:</strong> Installing
+                  shock absorbers, ensuring precise alignment, using cells with
+                  built-in temperature compensation, and performing frequent,
+                  automated calibrations.
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white rounded-lg shadow-md">
+            <button
+              class="accordion-header w-full flex justify-between items-center text-left p-5 font-semibold text-lg"
+            >
+              <span>Security & Data Integrity</span>
+              <span class="transform transition-transform duration-300">▼</span>
+            </button>
+            <div class="accordion-content">
+              <div
+                class="p-5 border-t border-slate-200 text-slate-600 space-y-4"
+              >
+                <div>
+                  <strong class="text-slate-800">Challenge:</strong> RFID tags
+                  can potentially be cloned, and wireless data transmission is
+                  vulnerable to hacking and eavesdropping.
+                </div>
+                <div>
+                  <strong class="text-slate-800">Solution:</strong> Implementing
+                  strong end-to-end encryption for all data, robust
+                  authentication protocols to verify tags and readers, and using
+                  a secondary verification system like cameras for Automatic
+                  Number Plate Recognition (ANPR).
+                </div>
+                <hr />
+                <div>
+                  <strong class="text-slate-800">Challenge:</strong> Central
+                  databases holding user and financial information are
+                  high-value targets for data breaches.
+                </div>
+                <div>
+                  <strong class="text-slate-800">Solution:</strong> Utilizing
+                  secure, managed cloud databases, implementing strict access
+                  controls, and considering technologies like blockchain for an
+                  immutable, transparent transaction ledger.
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white rounded-lg shadow-md">
+            <button
+              class="accordion-header w-full flex justify-between items-center text-left p-5 font-semibold text-lg"
+            >
+              <span>Public Adoption & Inclusion</span>
+              <span class="transform transition-transform duration-300">▼</span>
+            </button>
+            <div class="accordion-content">
+              <div
+                class="p-5 border-t border-slate-200 text-slate-600 space-y-4"
+              >
+                <div>
+                  <strong class="text-slate-800">Challenge:</strong> The public
+                  may be resistant to change or unfamiliar with how to use the
+                  new digital system.
+                </div>
+                <div>
+                  <strong class="text-slate-800">Solution:</strong> A
+                  comprehensive nationwide public education campaign to
+                  articulate the benefits and provide clear instructions. A
+                  phased rollout starting with a pilot project can also help
+                  ease the transition.
+                </div>
+                <hr />
+                <div>
+                  <strong class="text-slate-800">Challenge:</strong> Not all
+                  drivers may have access to digital payment methods like mobile
+                  money or bank accounts.
+                </div>
+                <div>
+                  <strong class="text-slate-800">Solution:</strong> Implementing
+                  hybrid payment options, such as physical kiosks at service
+                  stations where users can top up their RFID accounts with cash,
+                  ensuring no one is excluded.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="future" class="py-16 md:py-24 border-t border-slate-200">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl md:text-4xl font-bold tracking-tight">
+            The Future: Ghana's Digital Road Ahead
+          </h2>
+          <p class="mt-4 max-w-3xl mx-auto text-lg text-slate-600">
+            The automated tollbooth is more than just a payment system; it's a
+            foundational step towards a truly intelligent transportation
+            network. This section looks at the broader national context and the
+            exciting future enhancements that this technology enables,
+            positioning Ghana as a leader in smart infrastructure.
+          </p>
+        </div>
+        <div
+          class="bg-white p-8 rounded-2xl shadow-lg grid grid-cols-1 md:grid-cols-2 gap-8 items-center"
+        >
+          <div>
+            <h3 class="text-2xl font-bold text-sky-700">
+              National Vision for 2025
+            </h3>
+            <p class="mt-4 text-slate-600">
+              Ghana plans to reintroduce a fully digital tolling system
+              nationwide by 2025. This initiative, driven by a Public-Private
+              Partnership (PPP) model, will link payments directly to the Ghana
+              Card and mobile money platforms, aiming to generate essential
+              revenue for road maintenance and development under the legal
+              framework of the Tolls Act, 1973.
+            </p>
+          </div>
+          <div>
+            <h3 class="text-2xl font-bold text-sky-700">Future Enhancements</h3>
+            <ul class="mt-4 space-y-3 text-slate-600 list-disc list-inside">
+              <li>
+                <strong>AI-Powered Traffic Prediction:</strong> Use collected
+                data to forecast traffic flow and dynamically adjust toll prices
+                to manage congestion.
+              </li>
+              <li>
+                <strong>Blockchain for Transparency:</strong> Implement
+                blockchain for an unchangeable, fully transparent record of all
+                toll transactions, boosting public trust.
+              </li>
+              <li>
+                <strong>Broader IoT Integration:</strong> Add environmental or
+                road condition sensors to create a comprehensive Smart City data
+                network.
+              </li>
+              <li>
+                <strong>Predictive Maintenance:</strong> Use remote diagnostics
+                to monitor system health and predict component failures before
+                they happen, ensuring maximum uptime.
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="bg-slate-800 text-white">
+      <div
+        class="container mx-auto py-6 px-4 sm:px-6 lg:px-8 text-center text-sm"
+      >
+        <p>&copy; 2025 Ghana Smart Tolls Initiative. All Rights Reserved.</p>
+        <p class="text-slate-400 mt-1">
+          This interactive report is based on the study: "Design and
+          implementation of an automated tollbooth system (case study
+          amrahia-accra)".
+        </p>
+      </div>
+    </footer>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Mobile Menu Toggle
+        const mobileMenuButton = document.getElementById("mobile-menu-button");
+        const mobileMenu = document.getElementById("mobile-menu");
+        mobileMenuButton.addEventListener("click", () => {
+          mobileMenu.classList.toggle("hidden");
+        });
+
+        const mobileNavLinks = document.querySelectorAll("#mobile-menu a");
+        mobileNavLinks.forEach((link) => {
+          link.addEventListener("click", () => {
+            mobileMenu.classList.add("hidden");
+          });
+        });
+
+        // Chart.js Comparison Chart
+        const ctx = document.getElementById("comparisonChart").getContext("2d");
+        const comparisonChart = new Chart(ctx, {
+          type: "bar",
+          data: {
+            labels: [
+              "Avg. Transaction Speed",
+              "Throughput Capacity (Vehicles/hr)",
+              "Revenue Leakage Risk",
+            ],
+            datasets: [
+              {
+                label: "Manual Toll System",
+                data: [20, 300, 80],
+                backgroundColor: "rgba(100, 116, 139, 0.6)", // slate-500
+                borderColor: "rgba(100, 116, 139, 1)",
+                borderWidth: 1,
+              },
+              {
+                label: "Automated Toll System",
+                data: [95, 1200, 5],
+                backgroundColor: "rgba(14, 165, 233, 0.6)", // sky-500
+                borderColor: "rgba(14, 165, 233, 1)",
+                borderWidth: 1,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: "y",
+            scales: {
+              x: {
+                beginAtZero: true,
+                title: {
+                  display: true,
+                  text: "Relative Performance Score (Higher is Better)",
+                },
+              },
+            },
+            plugins: {
+              title: {
+                display: true,
+                text: "Manual vs. Automated System Performance",
+                font: { size: 18 },
+              },
+              tooltip: {
+                callbacks: {
+                  label: function (context) {
+                    let label = context.dataset.label || "";
+                    if (label) {
+                      label += ": ";
+                    }
+                    if (context.parsed.x !== null) {
+                      label += context.parsed.x + " (Score)";
+                    }
+                    return label;
+                  },
+                },
+              },
+            },
+          },
+        });
+
+        // Interactive System Diagram
+        const componentCards = document.querySelectorAll(".component-card");
+        const infoPanels = document.querySelectorAll(".component-info");
+        const initialInfoPanel = document.getElementById("info-initial");
+        const componentInfoPanel = document.getElementById(
+          "component-info-panel"
+        );
+
+        componentCards.forEach((card) => {
+          card.addEventListener("click", () => {
+            const targetId = card.dataset.target;
+
+            // Remove active state from all cards
+            componentCards.forEach((c) => c.classList.remove("active"));
+            // Add active state to clicked card
+            card.classList.add("active");
+
+            // Hide all info panels
+            initialInfoPanel.classList.add("hidden");
+            infoPanels.forEach((panel) => panel.classList.add("hidden"));
+
+            // Show target panel
+            const targetPanel = document.getElementById(targetId);
+            if (targetPanel) {
+              targetPanel.classList.remove("hidden");
+            }
+
+            // Animate panel entry
+            componentInfoPanel.style.opacity = "0";
+            componentInfoPanel.style.transform = "translateY(10px)";
+            setTimeout(() => {
+              componentInfoPanel.style.transition =
+                "opacity 0.3s, transform 0.3s";
+              componentInfoPanel.style.opacity = "1";
+              componentInfoPanel.style.transform = "translateY(0)";
+            }, 50);
+          });
+        });
+
+        // Accordion Logic
+        const accordionHeaders = document.querySelectorAll(".accordion-header");
+        accordionHeaders.forEach((header) => {
+          header.addEventListener("click", () => {
+            const content = header.nextElementSibling;
+            const arrow = header.querySelector("span:last-child");
+
+            // Close other open accordions
+            accordionHeaders.forEach((otherHeader) => {
+              if (otherHeader !== header) {
+                otherHeader.nextElementSibling.classList.remove("show");
+                otherHeader.querySelector("span:last-child").style.transform =
+                  "rotate(0deg)";
+              }
+            });
+
+            // Toggle current accordion
+            content.classList.toggle("show");
+            if (content.classList.contains("show")) {
+              arrow.style.transform = "rotate(180deg)";
+            } else {
+              arrow.style.transform = "rotate(0deg)";
+            }
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
