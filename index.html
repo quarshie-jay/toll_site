@@ -235,7 +235,7 @@
                 data-target="info-ir1"
               >
                 <h3 class="font-semibold">1. Vehicle Detection</h3>
-                <p class="text-sm text-slate-500">IR/Ultrasonic Sensor</p>
+                <p class="text-sm text-slate-500">Load cell sensorr</p>
               </div>
               <div
                 id="comp-rfid"
@@ -259,7 +259,7 @@
                 data-target="info-arduino"
               >
                 <h3 class="font-semibold">4. Central Processing</h3>
-                <p class="text-sm text-slate-500">Arduino Microcontroller</p>
+                <p class="text-sm text-slate-500">Esp 32 Microcontroller</p>
               </div>
               <div
                 id="comp-gsm"
@@ -267,7 +267,7 @@
                 data-target="info-gsm"
               >
                 <h3 class="font-semibold">5a. Communication</h3>
-                <p class="text-sm text-slate-500">GSM/Wi-Fi Module</p>
+                <p class="text-sm text-slate-500">4GSM </p>
               </div>
               <div
                 id="comp-lcd"
@@ -275,15 +275,15 @@
                 data-target="info-lcd"
               >
                 <h3 class="font-semibold">5b. User Feedback</h3>
-                <p class="text-sm text-slate-500">LCD/OLED Display</p>
+                <p class="text-sm text-slate-500">LCD and SMS</p>
               </div>
               <div
                 id="comp-servo"
                 class="component-card cursor-pointer p-4 bg-white rounded-lg shadow-md hover:shadow-xl transition-all text-center"
                 data-target="info-servo"
               >
-                <h3 class="font-semibold">5c. Action</h3>
-                <p class="text-sm text-slate-500">Servo Motor (Barrier)</p>
+                <h3 class="font-semibold">Visualization</h3>
+                <p class="text-sm text-slate-500">Grafana dashboards</p>
               </div>
             </div>
           </div>
@@ -304,7 +304,7 @@
                 Vehicle Detection Sensors
               </h4>
               <p class="mt-2 text-slate-600">
-                Infrared (IR) or Ultrasonic sensors are placed at the entry to
+                load cell is placed at the entry to
                 detect an approaching vehicle. They are the system's first
                 trigger, signaling the start of the tolling process. They also
                 ensure the vehicle is correctly positioned on the weighing
@@ -331,7 +331,7 @@
             </div>
             <div id="info-arduino" class="hidden component-info">
               <h4 class="font-bold text-lg text-sky-700">
-                Arduino Microcontroller
+                Esp32 Microcontroller
               </h4>
               <p class="mt-2 text-slate-600">
                 The "brain" of the system. This open-source microcontroller
@@ -348,8 +348,7 @@
               <p class="mt-2 text-slate-600">
                 This module connects the local tollbooth to a central database.
                 It's used to send transaction details, log data for analysis,
-                send SMS alerts to drivers about payments or overload status,
-                and check for information like stolen vehicles in real-time.
+                send SMS alerts to drivers about payments or overload status
               </p>
             </div>
             <div id="info-lcd" class="hidden component-info">
@@ -358,19 +357,14 @@
               </h4>
               <p class="mt-2 text-slate-600">
                 A small screen provides instant feedback to the driver,
-                displaying information like the toll amount, transaction status
-                (e.g., "Access Granted", "Insufficient Balance"), and the
+                displaying information like the toll amount, transaction status and the
                 remaining account balance, ensuring transparency.
               </p>
             </div>
             <div id="info-servo" class="hidden component-info">
               <h4 class="font-bold text-lg text-sky-700">Servo Motor</h4>
               <p class="mt-2 text-slate-600">
-                This is the actuator that controls the physical barrier. Upon
-                successful payment verification from the Arduino, the servo
-                motor receives a signal to lift the gate, allowing the vehicle
-                to pass. It closes automatically after the vehicle has cleared
-                the area.
+                This visualizes to toll operators the last transaction status and error logging
               </p>
             </div>
           </div>
@@ -472,8 +466,7 @@
             </div>
             <h3 class="text-xl font-semibold">Increased Safety & Security</h3>
             <p class="mt-2 text-slate-600">
-              The system can be linked to databases to flag stolen vehicles, and
-              smoother traffic flow contributes to fewer accidents on toll
+              The system can be linked to databases to smoother traffic flow contributes to fewer accidents on toll
               routes.
             </p>
           </div>
@@ -674,7 +667,7 @@
       <div
         class="container mx-auto py-6 px-4 sm:px-6 lg:px-8 text-center text-sm"
       >
-        <p>&copy; 2025 Ghana Smart Tolls Initiative. All Rights Reserved.</p>
+        <p>&copy; 2025 James Quarshie. All Rights Reserved.</p>
         <p class="text-slate-400 mt-1">
           This interactive report is based on the study: "Design and
           implementation of an automated tollbooth system (case study
