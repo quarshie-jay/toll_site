@@ -11,7 +11,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" 
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
     <!-- Visualization & Content Choices: 
@@ -235,7 +235,7 @@
                 data-target="info-ir1"
               >
                 <h3 class="font-semibold">1. Vehicle Detection</h3>
-                <p class="text-sm text-slate-500">Load Cell Sensor</p>
+                <p class="text-sm text-slate-500">IR/Ultrasonic Sensor</p>
               </div>
               <div
                 id="comp-rfid"
@@ -259,7 +259,7 @@
                 data-target="info-arduino"
               >
                 <h3 class="font-semibold">4. Central Processing</h3>
-                <p class="text-sm text-slate-500">Esp 32 Microcontroller</p>
+                <p class="text-sm text-slate-500">Arduino Microcontroller</p>
               </div>
               <div
                 id="comp-gsm"
@@ -267,7 +267,7 @@
                 data-target="info-gsm"
               >
                 <h3 class="font-semibold">5a. Communication</h3>
-                <p class="text-sm text-slate-500">GSM and Esp32 Wi-Fi channel</p>
+                <p class="text-sm text-slate-500">GSM/Wi-Fi Module</p>
               </div>
               <div
                 id="comp-lcd"
@@ -275,12 +275,15 @@
                 data-target="info-lcd"
               >
                 <h3 class="font-semibold">5b. User Feedback</h3>
-                <p class="text-sm text-slate-500">LCD Display & SMS Receipt</p>
+                <p class="text-sm text-slate-500">LCD/OLED Display</p>
               </div>
               <div
                 id="comp-servo"
                 class="component-card cursor-pointer p-4 bg-white rounded-lg shadow-md hover:shadow-xl transition-all text-center"
                 data-target="info-servo"
+              >
+                <h3 class="font-semibold">5c. Action</h3>
+                <p class="text-sm text-slate-500">Servo Motor (Barrier)</p>
               </div>
             </div>
           </div>
@@ -333,7 +336,8 @@
               <p class="mt-2 text-slate-600">
                 The "brain" of the system. This open-source microcontroller
                 processes all incoming data from the sensors, performs
-                calculations, checks the vehicle's account balance, display, and communication modules. It
+                calculations, checks the vehicle's account balance, and sends
+                commands to the barrier, display, and communication modules. It
                 makes the real-time decisions that automate the entire process.
               </p>
             </div>
@@ -357,6 +361,16 @@
                 displaying information like the toll amount, transaction status
                 (e.g., "Access Granted", "Insufficient Balance"), and the
                 remaining account balance, ensuring transparency.
+              </p>
+            </div>
+            <div id="info-servo" class="hidden component-info">
+              <h4 class="font-bold text-lg text-sky-700">Servo Motor</h4>
+              <p class="mt-2 text-slate-600">
+                This is the actuator that controls the physical barrier. Upon
+                successful payment verification from the Arduino, the servo
+                motor receives a signal to lift the gate, allowing the vehicle
+                to pass. It closes automatically after the vehicle has cleared
+                the area.
               </p>
             </div>
           </div>
@@ -456,6 +470,13 @@
             >
               🛡️
             </div>
+            <h3 class="text-xl font-semibold">Increased Safety & Security</h3>
+            <p class="mt-2 text-slate-600">
+              The system can be linked to databases to flag stolen vehicles, and
+              smoother traffic flow contributes to fewer accidents on toll
+              routes.
+            </p>
+          </div>
         </div>
       </section>
 
